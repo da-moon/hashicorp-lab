@@ -1,0 +1,24 @@
+
+__     ___                 _   ____  _             _ _
+\ \   / (_)___ _   _  __ _| | / ___|| |_ _   _  __| (_) ___
+ \ \ / /| / __| | | |/ _` | | \___ \| __| | | |/ _` | |/ _ \
+  \ V / | \__ \ |_| | (_| | |  ___) | |_| |_| | (_| | | (_) |
+   \_/  |_|___/\__,_|\__,_|_| |____/ \__|\__,_|\__,_|_|\___/
+
+  ____          _        ____       _
+ / ___|___   __| | ___  / ___|  ___| |_ _   _ _ __
+| |   / _ \ / _` |/ _ \ \___ \ / _ \ __| | | | '_ \
+| |__| (_) | (_| |  __/  ___) |  __/ |_| |_| | |_) |
+ \____\___/ \__,_|\___| |____/ \___|\__|\__,_| .__/
+                                             |_|
+
+- It is quite easy to use this box with visual studio code.
+- make sure 'Visual Studio Code Remote - SSH' plugin is installed on your host
+- Generate ssh config by running 'vagrant ssh-config'.
+- store the generated config in '~/.ssh/config'.
+
+> You can use 'vagrant ssh-config | tee -a ~/.ssh/config' one-liner to generate and store it.
+
+- The vagrant host is added to the list of available ssh host for VScode 
+  In `VScode`, press `ctrl+shift+p` , search for and choose `Remote-SSH: Connect to host...` ,
+  choose `vagrant-cloud-lab` host.

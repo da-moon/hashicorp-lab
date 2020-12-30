@@ -1,0 +1,23 @@
+---
+- block:
+  - command: kubectl version --client
+    register: kubectl_current_version
+    changed_when: false
+    failed_when: false
+  - shell: "curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt"
+    register: "kubectl_latest_version"
+  - block:
+    - name: 'downloading kubectl {{ kubectl_latest_version.stdout_lines[0] }}'
+      get_url:
+        url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubectl_latest_version.stdout_lines[0] }}/bin/{{ ansible_system | lower}}/{{ architecture_map[ansible_architecture] }}/kubectl"
+        dest: "/usr/local/bin/"
+        mode: 0755
+        owner: "root"
+        group: "root"
+        force: yes
+    become: yes
+    when: 
+      - kubectl_latest_version.stdout is defined
+      - (kubectl_current_version.rc != 0 ) or ( kubectl_latest_version.rc == 0 and kubectl_latest_version.stdout_lines[0] not in kubectl_current_version.stdout)
+  become: yes
+  

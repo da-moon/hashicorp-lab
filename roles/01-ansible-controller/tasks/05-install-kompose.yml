@@ -1,0 +1,21 @@
+- block:
+  - command: kompose version
+    register: kompose_current_version
+    changed_when: false
+    failed_when: false
+  - shell: "curl -sL https://api.github.com/repos/kubernetes/kompose/tags | jq -r '[.[] | select(.name | ( contains(\"alpha\") or contains(\"beta\") or contains(\"rc\"))|not).name]|max_by( . | [splits(\"[.]\")])'"
+    register: "kompose_latest_version"
+  - block:
+    - name: 'downloading kompose {{ kompose_latest_version.stdout_lines[0] }}'
+      get_url:
+        url: "https://github.com/kubernetes-incubator/kompose/releases/download/{{ kompose_latest_version.stdout_lines[0] }}/kompose-{{ ansible_system | lower}}-{{ architecture_map[ansible_architecture] }}"
+        dest: "/usr/local/bin/kompose"
+        mode: 0755
+        owner: "root"
+        group: "root"
+        force: yes
+    become: yes
+    when: 
+      - kompose_latest_version.stdout is defined
+      - (kompose_current_version.rc != 0 ) or ( kompose_latest_version.rc == 0 and kompose_latest_version.stdout_lines[0] not in 'v'+kompose_current_version.stdout)
+  become: yes

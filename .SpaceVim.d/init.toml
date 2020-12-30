@@ -1,0 +1,122 @@
+[[custom_plugins]]
+    repo = "pearofducks/ansible-vim"
+    merged = false
+[[custom_plugins]]
+    repo = "chr4/nginx.vim"
+    merged = false
+
+[[custom_plugins]]
+    repo = "hashivim/vim-hashicorp-tools"
+    merged = false
+
+[[custom_plugins]]
+  repo = "jvirtanen/vim-hcl"
+  merged = false
+
+[[layers]]
+name = 'autocomplete'
+auto_completion_return_key_behavior = "complete"
+auto_completion_tab_key_behavior = "smart"
+
+[[layers]]
+name = 'shell'
+default_position = 'top'
+default_height = 30
+
+[[layers]]
+  name = "colorscheme"
+
+[[layers]]
+  name = "tools"
+
+[[layers]]
+  # [REF] => https://spacevim.org/layers/format/
+  name = "format"
+  format_on_save = true
+
+[[layers]]
+  # [REF] => https://spacevim.org/layers/ui/
+  name = "ui"
+
+[[layers]]
+  # [REF] => https://spacevim.org/layers/git/
+  name = "git"
+
+[[layers]]
+  # [REF] => https://spacevim.org/layers/github/
+  name = "github"
+
+[[layers]]
+  # [REF] => https://spacevim.org/layers/sudo/
+  name = "sudo"
+
+[[layers]]
+  # [REF] => https://spacevim.org/layers/lang/sh/
+  name = "lang#sh"
+
+[[layers]]
+  name = "lang#toml"
+
+[[layers]]
+  name = "lang#xml"
+
+[[layers]]
+  # [REF] => https://spacevim.org/layers/core/statusline/
+  name = "core#statusline"
+[[layers]]
+  name = "lang#dockerfile"
+
+[[layers]]
+  # [REF] => https://spacevim.org/layers/lang/gosu/
+  name = "lang#gosu"
+
+# sudo yarn global add --prefix /usr/local remark remark-cli remark-stringify remark-frontmatter wcwidth 
+[[layers]]
+  name = "lang#markdown"
+
+[options]
+  #colorscheme = "gruvbox"
+  colorscheme = "NeoSolarized"
+  colorscheme_bg = "dark"
+  enable_guicolors = true
+  statusline_separator = "arrow"
+  statusline_iseparator = "arrow"
+  buffer_index_type = 4
+  enable_tabline_filetype_icon = true
+  enable_statusline_mode = false
+  filemanager = "nerdtree"
+  # [Start] => Statusline
+  # options for statusline
+  # Set the statusline separators of statusline, default is "arrow"
+  statusline_separator = "arrow"
+  # Set the statusline separators of inactive statusline
+  statusline_iseparator = "bar"
+  # Set SpaceVim buffer index type
+  buffer_index_type = 4
+  # 0: 1 ? ?
+  # 1: 1 ? ?
+  # 2: 1 ? ?
+  # 3: 1 ? ?
+  # 4: 1 ? 1
+  # Enable/Disable show mode on statusline
+  enable_statusline_mode = true
+  # left sections of statusline
+  statusline_left_sections = [
+    'winnr',
+    'major mode',
+    'filename',
+    'fileformat',
+    'minor mode lighters',
+    'version control info',
+    'search status'
+  ]
+  # right sections of statusline
+  statusline_right_sections = [
+    'cursorpos',
+    'percentage',
+    'input method',
+    'date',
+    'time'
+  ]
+  # [END] => Statusline
+

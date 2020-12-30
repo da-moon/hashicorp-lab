@@ -1,0 +1,20 @@
+  ___                       _               
+ / _ \__   _____ _ ____   _(_) _____      __
+| | | \ \ / / _ \ '__\ \ / / |/ _ \ \ /\ / /
+| |_| |\ V /  __/ |   \ V /| |  __/\ V  V / 
+ \___/  \_/ \___|_|    \_/ |_|\___| \_/\_/  
+
+
+In this screencast, I will demonstrate how to use this repo.
+Generally, working with this is pretty straightforward. 
+All you need to do is type 'vagrant up' and you are good to go.
+
+Some Pointers:
+- Install Vagrant through package manager;
+  i.e 'pacman' or 'apt' . Downloading vagrant binary and running 
+  it directly can cause unexpected behavior on certain Linux 
+  distributions since Vagrant binary is not statically link but rather an AppImage.
+- There are two available providers: Virtualbox and Docker. 
+  In case you are using 'virtualbox' provider, 
+  make sure that your CPU supports nested virtualization; 
+  i.e., you won't be able to use the VirtualBox provider on an AWS EC2 instance.

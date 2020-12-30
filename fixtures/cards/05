@@ -1,0 +1,22 @@
+    _              _ _     _        _          _     
+   / \   _ __  ___(_) |__ | | ___  | |    __ _| |__  
+  / _ \ | '_ \/ __| | '_ \| |/ _ \ | |   / _` | '_ \ 
+ / ___ \| | | \__ \ | |_) | |  __/ | |__| (_| | |_) |
+/_/   \_\_| |_|___/_|_.__/|_|\___| |_____\__,_|_.__/ 
+                                                     
+- In this section, I will show you how to set up a cluster with LXD containers
+  inside the Box and provision them with Ansible.
+- I usually use this workflow to test my ansible playbooks before running them against QA/Prod
+  environments in cloud
+- You can control a number of generated containers by editing the 'vars.mk' file. Default number
+  of the generated containers in my workflow is three, but I will use 4 for the sake of this demo
+- there are two main Make targets:
+  - 'make init' : starts and provisions the container with the help of the 'lxd-Debian' script.
+  - 'make lxd-clean' : removes the containers
+- I would recommend running the Make targets with '-j$(nproc)' to use all available cores and setup/teardown
+  the containers in parallel
+- 'lxd-Debian' script takes care of a lot of cumbersome tasks needed to set up minimal containers 
+  to use as ansible hosts. Run 'lxd-Debian --help' to see a list of all possible provisioning options 'lxd-Debian' script offers.
+- in the 'make init' target, the number of arguments passed to the script is limited since we want to have
+  minimal containers and provision them after launch with Ansible to mimic live cloud environment
+

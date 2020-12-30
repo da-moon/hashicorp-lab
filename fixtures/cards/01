@@ -1,0 +1,13 @@
+ ____  _             _   _               _   _            ____            
+/ ___|| |_ __ _ _ __| |_(_)_ __   __ _  | |_| |__   ___  | __ )  _____  __
+\___ \| __/ _` | '__| __| | '_ \ / _` | | __| '_ \ / _ \ |  _ \ / _ \ \/ /
+ ___) | || (_| | |  | |_| | | | | (_| | | |_| | | |  __/ | |_) | (_) >  < 
+|____/ \__\__,_|_|   \__|_|_| |_|\__, |  \__|_| |_|\___| |____/ \___/_/\_\
+                                 |___/                                    
+
+- running 'vagrant up' would start the Box. 
+- If needed plugins are not installed, it would install them first.
+- By default, it uses the VirtualBox provider. 
+- If needed, you can use docker provider by running 'vagrant up --provider=docker'
+- If you are running vagrant up for the first time, it would run provisioners and setup
+  the environment. In other cases, it would only start the VM.

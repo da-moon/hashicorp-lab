@@ -1,0 +1,21 @@
+- block:
+  - command: minikube version
+    register: minikube_current_version
+    changed_when: false
+    failed_when: false
+  - shell: "curl -sL https://api.github.com/repos/kubernetes/minikube/tags | jq -r '[.[] | select(.name | ( contains(\"alpha\") or contains(\"beta\") or contains(\"rc\"))|not).name]|max_by( . | [splits(\"[.]\")])'"
+    register: "minikube_latest_version"
+  - block:
+    - name: 'downloading minikube {{ minikube_latest_version.stdout_lines[0] }}'
+      get_url:
+        url: "https://storage.googleapis.com/minikube/releases/{{ minikube_latest_version.stdout_lines[0] }}/minikube-{{ ansible_system | lower}}-{{ architecture_map[ansible_architecture] }}"
+        dest: "/usr/local/bin/minikube"
+        mode: 0755
+        owner: "root"
+        group: "root"
+        force: yes
+    become: yes
+    when: 
+      - minikube_latest_version.stdout is defined
+      - (minikube_current_version.rc != 0 ) or ( minikube_latest_version.rc == 0 and minikube_latest_version.stdout_lines[0] not in minikube_current_version.stdout)
+  become: yes
