@@ -300,7 +300,6 @@ EOF
 function provision_python(){
 	local -r container_name="$1"
   log_info "'$container_name' container : installing python packages"
-# [NOTE] => poetry install
 cat << EOF | lxc exec "${container_name}" -- bash --
 sudo apt-get update -qq
 sudo apt-get install -yqq curl \
@@ -309,13 +308,6 @@ sudo apt-get install -yqq curl \
   python-setuptools python3-setuptools \
   python-pip python3-pip
 EOF
-  log_info "'$container_name' container : installing poetry"
-ssh -q "${container_name}" << 'ENDSSH'
-curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
-mkdir -p $HOME/.local
-echo "export PATH='$PATH:$HOME/.local/bin'" >> $HOME/.profile
-echo "alias poetry='python3 ~/.poetry/bin/poetry'" >> $HOME/.profile
-ENDSSH
 }
 function provision_rbenv(){
 	local -r container_name="$1"
@@ -668,7 +660,7 @@ function help() {
   echo -e "  --spacevim\t\tinstall and configures spacevim.Default:'false'"
   echo -e "  --goenv\t\tinstall goenv and go toolchain.Default:'false'"
   echo -e "  --rbenv\t\tinstall rbenv and ruby toolchain.Default:'false'"
-  echo -e "  --python\t\tinstall python and poetry.Default:'false'"
+  echo -e "  --python\t\tinstall python.Default:'false'"
   echo -e "  --docker\t\tinstalls docker and docker-compose.make sure container is privileged.Default:'false'"
   echo -e "  --username\t\tdefault user to create inside the container.Default:'$USER'"
   echo -e "  --distro\t\tcontainer distro.Supported Values: 'debian'.Default:'debian'"

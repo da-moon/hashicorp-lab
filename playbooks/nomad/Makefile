@@ -27,15 +27,17 @@ THIS_FILE := $(firstword $(MAKEFILE_LIST))
 SELF_DIR := $(dir $(THIS_FILE))
 .PHONY: $(PROJECT_NAME)
 .SILENT: $(PROJECT_NAME)
-$(PROJECT_NAME): $(PROJECT_NAME)-containers
+$(PROJECT_NAME): $(PROJECT_NAME)-inventories
 	- $(call print_running_target)
-	- $(eval command=ansible-playbook -i inventories/staging site.yml --limit staging-servers)
+	- $(eval command=ansible-playbook -i staging site.yml --limit staging-servers)
 ifneq ($(VAULT_PASSWORD_FILE),)
 	- $(eval command=$(command) --vault-password-file $(VAULT_PASSWORD_FILE))
+	- $(eval command=$(command) -e vault_password_file=$(VAULT_PASSWORD_FILE))
 endif
-	- $(eval command=$(command) && ansible-playbook -i inventories/staging site.yml --limit staging-clients)
+	- $(eval command=$(command) && ansible-playbook -i staging site.yml --limit staging-clients)
 ifneq ($(VAULT_PASSWORD_FILE),)
 	- $(eval command=$(command) --vault-password-file $(VAULT_PASSWORD_FILE))
+	- $(eval command=$(command) -e vault_password_file=$(VAULT_PASSWORD_FILE))
 endif
 	- @$(MAKE) --no-print-directory \
 	 -f $(THIS_FILE) shell cmd="${command}"
@@ -43,6 +45,18 @@ ifneq ($(DELAY),)
 	- sleep $(DELAY)
 endif
 	- $(call print_completed_target)
+
+.PHONY: $(PROJECT_NAME)-inventories
+.SILENT: $(PROJECT_NAME)-inventories
+$(PROJECT_NAME)-inventories:
+	- $(call print_running_target)
+	- echo '[staging-servers]' | tee $(SELF_DIR)/staging > /dev/null
+	- seq $(CONTAINER_COUNT) | xargs -I {} echo "$(PROJECT_NAME)-server-{}" | tee -a $(SELF_DIR)/staging > /dev/null
+	- echo '[staging-clients]' | tee -a $(SELF_DIR)/staging > /dev/null
+	- seq $(CONTAINER_COUNT) | xargs -I {} echo "$(PROJECT_NAME)-client-{}" | tee -a $(SELF_DIR)/staging > /dev/null
+	- $(call print_completed_target)
+
+
 .PHONY: $(PROJECT_NAME)-containers
 .SILENT: $(PROJECT_NAME)-containers
 $(PROJECT_NAME)-containers:

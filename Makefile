@@ -27,6 +27,23 @@ $(PLAYBOOKS_TARGETS):
 .SILENT: playbooks-info
 playbooks-info:
 	- $(info $(PLAYBOOKS_TARGETS))
+INVENTORIES_TARGETS=$(PLAYBOOKS_TARGETS:%=%-inventories)
+.PHONY: inventories
+.SILENT: inventories
+inventories:
+	- $(call print_running_target)
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) $(INVENTORIES_TARGETS)
+	- $(call print_completed_target)
+.PHONY: $(INVENTORIES_TARGETS)
+.SILENT: $(INVENTORIES_TARGETS)
+$(INVENTORIES_TARGETS):
+	- $(eval name=$(@:%-inventories=%))
+	- @$(MAKE) --no-print-directory -C playbooks/$(name)/ $(name)-inventories
+
+.PHONY: inventories-info
+.SILENT: inventories-info
+inventories-info:
+	- $(info $(INVENTORIES_TARGETS))
 
 CONTAINER_TARGETS=$(PLAYBOOKS_TARGETS:%=%-containers)
 .PHONY: containers
