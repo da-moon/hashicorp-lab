@@ -32,7 +32,7 @@ lxd init \
   --network-port="8443" \
   --trust-password="$DEFAULT_USER" \
   --storage-backend="btrfs" \
-  --storage-create-loop="35" \
+  --storage-create-loop="60" \
   --storage-pool="default" || true
 _EOF_
 # [NOTE] => needed to allow lxd containers to access internet

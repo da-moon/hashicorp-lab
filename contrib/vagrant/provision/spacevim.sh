@@ -16,7 +16,7 @@ fi
 
 curl -sLf https://spacevim.org/install.sh | bash > /dev/null 2>&1
 curl -sLf https://spacevim.org/install.sh | sudo -H -s -u root bash -s > /dev/null 2>&1
-sudo python3 -m pip install --upgrade pynvim notedown
+sudo python3 -m pip install --upgrade pynvim notedown > /dev/null 2>&1
 sudo yarn global add --silent remark remark-cli remark-stringify remark-frontmatter wcwidth >/dev/null 2>&1
 mkdir -p ~/.SpaceVim.d/
 cat << EOF | tee ~/.SpaceVim.d/init.toml > /dev/null

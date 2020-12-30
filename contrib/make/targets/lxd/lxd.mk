@@ -1,17 +1,4 @@
 
-PROJECT_TARGETS:=$(PROJECT_NAME)
-ifneq ($(CONTAINER_COUNT),)
-CONTAINER_SEQ:=$(shell seq $(CONTAINER_COUNT))
-PROJECT_TARGETS = $(CONTAINER_SEQ:%=$(PROJECT_NAME)-%)
-endif
-
-PROJECT_CONTAINERS=$(PROJECT_TARGETS:%=lxd-%)
-LXD_TARGETS = $(PROJECT_CONTAINERS)
-LXD_LAUNCH_TARGETS = $(PROJECT_TARGETS:%=lxd-launch-%)
-LXD_START_TARGETS = $(PROJECT_TARGETS:%=lxd-start-%)
-LXD_STOP_TARGETS = $(PROJECT_TARGETS:%=lxd-stop-%)
-LXD_CLEAN_TARGETS = $(PROJECT_TARGETS:%=lxd-clean-%)
-
 .PHONY: $(LXD_TARGETS)
 .SILENT: $(LXD_TARGETS)
 $(LXD_TARGETS):
@@ -30,14 +17,13 @@ ifneq ($(DELAY),)
 	- sleep $(DELAY)
 endif
 	- $(call print_completed_target)
-.PHONY: $(LXD_LAUNCH_TARGETS)
-.SILENT: $(LXD_LAUNCH_TARGETS)
-$(LXD_LAUNCH_TARGETS): 
+.PHONY: $(LXD_START_TARGETS)
+.SILENT: $(LXD_START_TARGETS)
+$(LXD_START_TARGETS): 
 	- $(call print_running_target)
-	- $(eval name=$(@:lxd-launch-%=%))
-	- $(call print_running_target, launching a new LXD container with name of $(name) and base image of $(LXC_IMAGE))
-	- $(eval command=lxc launch $(LXC_IMAGE) "$(name)")
-	- $(eval command=$(command) || lxc start "$(name)")
+	- $(eval name=$(@:lxd-start-%=%))
+	- $(call print_running_target, starting $(name))
+	- $(eval command=lxc start "$(name)")
 	- @$(MAKE) --no-print-directory \
 	 -f $(THIS_FILE) shell cmd="${command}"
 ifneq ($(DELAY),)
@@ -81,9 +67,7 @@ $(LXD_CLEAN_TARGETS):  lxd-clean-%:lxd-stop-%
 .SILENT: lxd
 lxd: 
 	- $(call print_running_target)
-	- $(info CONTAINER_NAME >> $(CONTAINER_NAME) )
 	- $(info $(LXD_TARGETS))
-	- $(info $(LXD_LAUNCH_TARGETS))
 	- $(info $(LXD_START_TARGETS))
 	- $(call print_completed_target)
 

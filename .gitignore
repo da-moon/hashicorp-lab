@@ -1,7 +1,2 @@
 .vagrant
-**/.terraform/*
-**/.tfstate
-**/.tfstate.*
-*.retry
-.tmp
-tmp
+**/.retry
