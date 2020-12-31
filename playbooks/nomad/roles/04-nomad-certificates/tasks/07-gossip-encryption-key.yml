@@ -1,0 +1,22 @@
+---
+
+- block:  
+  - name: "ensuring directory to store encrypted variables exists"
+    file:
+      path: "{{ inventory_dir+'/group_vars'}}"
+      state: directory
+      owner: "{{ ansible_user }}"
+      mode: '0755'
+  - name: "ensuring files to store encrypted variables are created"
+    file:
+      path: "{{ inventory_dir+'/group_vars/gossip_encryption_key.yml'}}"
+      owner: "{{ ansible_user }}"
+      mode: '0755'
+      state: touch
+  - name: "Generating amd Encrypting nomad gossip encryption key"
+    shell: "echo -n \"$(dd if=/dev/urandom bs=16 count=1 status=none | base64)\" | ansible-vault encrypt_string --vault-password-file={{ vault_password_file }}  --stdin-name 'gossip_encryption_key'"
+    register: "gossip_encryption_key_enc"
+  - blockinfile:
+      path: "{{ inventory_dir+'/group_vars/gossip_encryption_key.yml'}}"
+      block: "{{ gossip_encryption_key_enc.stdout_lines | join('\n') }}"
+  run_once: true

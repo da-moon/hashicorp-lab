@@ -1,0 +1,73 @@
+
+- hosts: all
+  gather_facts: no
+  pre_tasks:
+  - name: "Asserting variables globally used variables"
+    assert:
+      that:
+        - architecture_map is defined
+        - systemd_unit_directory is defined
+  - block :
+    - name: check python executable is present
+      shell: "which python"
+      register: result
+      ignore_errors: true
+    - name: 'install python'
+      raw: 'apt-get install -yqq python'
+      when: result.rc != 0
+    - name: check python-apt is installed
+      shell: "dpkg -l | grep python-apt"
+      register: result
+      ignore_errors: true
+    - name: 'install python-apt'
+      raw: 'apt-get install -yqq python-apt'
+      when: result.rc != 0
+  become: yes
+- name: Ansible controller local dependency installer
+  hosts: all
+  gather_facts: yes
+  roles:
+    - { role: 01-ansible-controller, tags: ["01-ansible-controller"]}  
+    - { role: 02-install-prerequisites, tags: ["02-install-prerequisites"]}  
+    - { role: 03-install-nomad, tags: ["03-install-nomad"]}       
+- name: Hashicorp Cluster nomad server setup playbooks
+  hosts: staging-servers
+  gather_facts: yes
+  pre_tasks:
+  vars_prompt:
+  - name: vault_password_file
+    prompt: Where is ansible-vault password file?
+    private: no
+  vars:
+    nomad_tls_disable : false
+    override_certificate: true
+    certificate_root_dir: "{{ inventory_dir+'/host_vars/certificates'}}"
+  roles:
+    - { role: 04-nomad-certificates, tags: ["04-nomad-certificates"] }
+    - role: 05-configure-nomad-server 
+      tags: 
+        - "05-configure-nomad-server" 
+      vars:
+        log_level : "{{ lookup('env','NOMAD_LOG_LEVEL') | default('DEBUG', true) }}"
+        # => [ WARN ] if set to true, then the server would not verify client tls
+        nomad_ui : "{{ lookup('env','NOMAD_UI') | default(true, true) }}"
+- name: Hashicorp Cluster nomad client setup playbooks
+  hosts: staging-clients
+  gather_facts: yes
+  pre_tasks:
+  vars_prompt:
+  - name: vault_password_file
+    prompt: Where is ansible-vault password file?
+    private: no
+  vars:
+    nomad_tls_disable : false
+    override_certificate: true
+    certificate_root_dir: "{{ inventory_dir+'/host_vars/certificates'}}"
+  roles:
+    - role: 06-configure-nomad-client
+      tags: 
+        - "06-configure-nomad-client" 
+      vars:
+        log_level : "{{ lookup('env','NOMAD_LOG_LEVEL') | default('DEBUG', true) }}"
+        # => [ WARN ] if set to true, then the server would not verify client tls
+        nomad_ui : "{{ lookup('env','NOMAD_UI') | default(true, true) }}"

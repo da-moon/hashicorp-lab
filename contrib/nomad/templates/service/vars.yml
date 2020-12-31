@@ -1,0 +1,38 @@
+---
+service:
+  name: "http-echo-rs"
+  domain: "sigfodr.com"
+# [NOTE] => optional; default to env var 'DC' or if env var is not present, it would default to 'dc1'
+  datacenters :
+    - "dc1"
+# [NOTE] => optional; defaults to rolling release
+  canary: true
+# [NOTE] => optional; defaults to 1
+  count: 1
+# [NOTE] => optional; defaults to 300mb
+  disk_size: 50
+# [NOTE] => optional; defaults to 3
+  logs_max_files: 1
+# [NOTE] => optional; defaults to 1MB
+  logs_max_file_size: 1
+# [NOTE] => optional; disables health checks if not present
+#  health_check_path: "/health"
+# [NOTE] => optional; disables health checks if not present
+  port_name: "http"
+  ram: 50
+  cpu: 50
+docker:
+  image_name: "fjolsvin/http-echo-rs"
+# [NOTE] => you can replace the image with hashicorp/http-echo.
+#  image_name: "hashicorp/http-echo"
+# [NOTE] => optional;
+  tag: "latest"
+# [NOTE] => optional;
+  args:
+   - "--text"
+   - "hello-hashicorp-lab"
+   - "--listen" 
+   - ":${ NOMAD_PORT_http }"
+# [NOTE] => optional;
+#  volumes:
+#    - "/etc/consul.d/certs:/etc/consul.d/certs:ro"

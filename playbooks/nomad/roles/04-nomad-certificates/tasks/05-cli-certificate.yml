@@ -1,0 +1,39 @@
+---
+
+- stat:
+    path: "{{ certificate_root_dir }}/nomad/cli.pem.enc"
+  register: "cli_pem_enc"
+- stat:
+    path: "{{ certificate_root_dir }}/nomad/cli-key.pem.enc"
+  register: "cli_key_pem_enc"
+- stat:
+    path: "{{ certificate_root_dir }}/nomad/cli.csr.enc"
+  register: "cli_csr_enc"    
+- block:
+  - name : "removing leftover nomad cli 'cli.pem.enc'"
+    file: 
+      path: "{{ certificate_root_dir }}/nomad/cli.pem.enc"
+      state: absent
+    when:
+      - cli_pem_enc.stat.exists
+  - name : "removing leftover nomad cli 'cli-key.pem.enc'"
+    file: 
+      path: "{{ certificate_root_dir }}/nomad/cli-key.pem.enc"
+      state: absent
+    when:
+      - cli_key_pem_enc.stat.exists
+  - name : "removing leftover nomad cli 'cli.csr.enc'"
+    file: 
+      path: "{{ certificate_root_dir }}/nomad/cli.csr.enc"
+      state: absent
+    when:
+      - cli_csr_enc.stat.exists
+  - name: "Generating nomad cli certificate"
+    shell: "echo '{}' | sudo cfssl gencert -ca={{ certificate_root_dir }}/nomad/ca.pem -ca-key={{ certificate_root_dir }}/nomad/ca-key.pem --profile=client - | cfssljson -bare cli"
+    args:
+      chdir: "{{ certificate_root_dir }}/nomad"
+  when: >
+    ca_pem_enc.stat.exists == False or
+    ca_key_pem_enc.stat.exists == False or
+    ca_csr_enc.stat.exists == False
+  run_once: true

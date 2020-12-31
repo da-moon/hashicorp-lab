@@ -1,0 +1,39 @@
+---
+- block :
+  - stat:
+      path: "{{ certificate_root_dir }}/nomad/ca.pem.enc"
+    register: "ca_pem_enc"
+  - stat:
+      path: "{{ certificate_root_dir }}/nomad/ca-key.pem.enc"
+    register: "ca_key_pem_enc"
+  - stat:
+      path: "{{ certificate_root_dir }}/nomad/ca.csr.enc"
+    register: "ca_csr_enc"
+  - block:
+    - name : "removing leftover ca.pem.enc for nomad"
+      file: 
+        path: "{{ certificate_root_dir }}/nomad/ca.pem.enc"
+        state: absent
+      when:
+        - ca_pem_enc.stat.exists
+    - name : "removing leftover ca-key.pem.enc for nomad"
+      file: 
+        path: "{{ certificate_root_dir }}/nomad/ca-key.pem.enc"
+        state: absent
+      when:
+        - ca_key_pem_enc.stat.exists
+    - name : "removing leftover ca.csr.enc for nomad"
+      file: 
+        path: "{{ certificate_root_dir }}/nomad/ca.csr.enc"
+        state: absent
+      when:
+        - ca_csr_enc.stat.exists
+    - name: "Generating nomad CA's private key and certificate"
+      shell: "cfssl print-defaults csr | cfssl gencert -initca - | cfssljson -bare ca"
+      args:
+        chdir: "{{ certificate_root_dir }}/nomad"
+    when : >
+      ca_pem_enc.stat.exists == False or
+      ca_key_pem_enc.stat.exists == False or
+      ca_csr_enc.stat.exists == False
+  run_once: true

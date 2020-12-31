@@ -1,0 +1,28 @@
+---
+
+- name: Assert variables
+  assert:
+    that:
+      - nomad_api_port is defined
+      - nomad_cluster_port is defined
+      - log_level is defined
+      - nomad_storage_path is defined
+      - nomad_tls_disable is defined
+      - systemd_unit_directory is defined
+      - nomad_config_directory_path is defined
+      - private_ip is defined
+      - retry_join_ips is defined
+      - play_encrypted_vars_dir is defined
+      - nomad_profile_path is defined
+      - nomad_data_path is defined
+      - nomad_plugins_path is defined
+      - nomad_client_path is defined
+      - nomad_ui is defined
+      - cni_config_dir is defined
+      
+- name: Assert conditional variables
+  assert:
+    that:
+      - nomad_tls_path is defined
+  when:
+    - not nomad_tls_disable

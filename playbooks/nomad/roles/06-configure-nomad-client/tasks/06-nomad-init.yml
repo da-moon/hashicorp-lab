@@ -1,0 +1,94 @@
+---
+- block:
+  - name: "ensuring nomad global environment variables file exists"
+    file:
+        path: "{{ nomad_profile_path }}"
+        owner: "root"
+        group: "root"
+        mode: '0755'
+        state: touch
+  - name: "set nomad environment variables"
+    blockinfile:
+      path: "{{ nomad_profile_path }}"
+      block: |
+        export NOMAD_ADDR='http{% if not nomad_tls_disable %}s{% endif %}://127.0.0.1:{{ nomad_api_port }}'
+        {% if not nomad_tls_disable %}export NOMAD_CACERT='{{ nomad_tls_path }}/ca.pem'
+        export NOMAD_CLIENT_KEY='{{ nomad_tls_path }}/client-key.pem'
+        export NOMAD_CLIENT_CERT='{{ nomad_tls_path }}/client.pem'
+        {% endif %}
+  become: yes
+# [TODO] => ACL
+
+
+# - name: "checking status of nomad client"
+#   shell: >
+#     nomad status -address=http{% if not nomad_tls_disable %}s{% endif %}://127.0.0.1:{{ nomad_api_port }} 
+#     {% if not nomad_tls_disable %} \
+#       -ca-cert='{{ nomad_tls_path }}/ca.pem' \
+#       -client-cert='{{ nomad_tls_path }}/client.pem' \
+#       -client-key='{{ nomad_tls_path }}/client-key.pem' \
+#     {% endif %}
+#     -format=json
+#   ignore_errors: true
+#   register: "nomad_status"
+# - set_fact:
+#     nomad_status: "{{ nomad_status.stdout | from_json }}"
+# - block:
+#   - name: "initializing single node in nomad cluster"
+#     shell: >
+#       nomad operator init 
+#       -address=http{% if not nomad_tls_disable %}s{% endif %}://127.0.0.1:{{ nomad_api_port }}
+#       {% if not nomad_tls_disable %} \
+#         -ca-cert='{{ nomad_tls_path }}/ca.pem' \
+#         -client-cert='{{ nomad_tls_path }}/client.pem' \
+#         -client-key='{{ nomad_tls_path }}/client-key.pem' \
+#       {% endif %} -format=json
+#     register: "nomad_init_response"
+#   - set_fact:
+#       nomad_init_response: "{{ nomad_init_response.stdout | from_json }}"
+#   - set_fact:
+#       nomad_root_token: "{{ nomad_init_response.root_token }}"
+#       nomad_unseal_keys_b64: "{{ nomad_init_response.unseal_keys_b64 }}"
+#   - debug: "var=nomad_root_token"
+#   - debug: "var=nomad_unseal_keys_b64"
+#   - name: "unsealing initialized nomad node"
+#     command: >
+#       nomad operator unseal 
+#       -address=http{% if not nomad_tls_disable %}s{% endif %}://127.0.0.1:{{ nomad_api_port }}
+#       {% if not nomad_tls_disable %} \
+#         -ca-cert='{{ nomad_tls_path }}/ca.pem' \
+#         -client-cert='{{ nomad_tls_path }}/client.pem' \
+#         -client-key='{{ nomad_tls_path }}/client-key.pem' \
+#       {% endif %} {{ item }}
+#     loop: "{{ nomad_unseal_keys_b64 }}"
+#   - block:
+#     - name: "ensuring directory to store encrypted variables exists"
+#       file:
+#         path: "{{ play_encrypted_vars_dir }}"
+#         state: directory
+#         owner: "{{ ansible_user }}"
+#         mode: '0755'
+#     - name: "ensuring files to store encrypted variables are created"
+#       file:
+#         path: "{{ play_encrypted_vars_dir }}/{{ item }}.yml"
+#         owner: "{{ ansible_user }}"
+#         mode: '0755'
+#         state: touch
+#       loop:
+#         - nomad_unseal_keys_b64
+#         - nomad_root_token
+#     - name: "encrypting nomad root token with ansible-nomad"
+#       shell: "echo -n \"{{ nomad_root_token }}\" | ansible-nomad encrypt_string --nomad-password-file={{ nomad_password_file }} --stdin-name 'nomad_root_token'"
+#       register: "encrypted_nomad_root_token"
+#     - name: "encrypting nomad unseal keys with ansible-nomad"
+#       shell: "echo -n \"{{ nomad_unseal_keys_b64 }}\" | ansible-nomad encrypt_string --nomad-password-file={{ nomad_password_file }} --stdin-name 'nomad_unseal_keys_b64'"
+#       register: "encrypted_nomad_unseal_keys_b64"
+#     - blockinfile:
+#         path: "{{ play_encrypted_vars_dir }}/nomad_root_token.yml"
+#         block: "{{ encrypted_nomad_root_token.stdout_lines | join('\n') }}"
+#     - blockinfile:
+#         path: "{{ play_encrypted_vars_dir }}/nomad_unseal_keys_b64.yml"
+#         block: "{{ encrypted_nomad_unseal_keys_b64.stdout_lines | join('\n') }}"
+#     delegate_to: localhost
+#   when:
+#     - not nomad_status.initialized

@@ -1,0 +1,14 @@
+---
+service:
+  name: "http-echo-rs"
+  datacenters :
+    - "dc1"
+  # [NOTE] => if removed , it would be a oneshot job
+  # [NOTE] => you can use this snippet to purge stopped batch jobs :
+  # nomad job status | grep 'curl' | awk '{print $1}' | xargs -I {} -P `nproc` nomad job stop --purge {}
+  # cron: "* * * * *"
+curl:
+  image_tag: "7.73.0"
+  urls:
+    # [NOTE] => same name as the service registered in consul.
+    - "http://http-echo-rs-svc:8080"

@@ -25,81 +25,95 @@ ansible -i staging -m ping all -vvv
 echo -n "$(dd if=/dev/urandom bs=64 count=1 status=none | base64)" | tee ~/.vault_pass.txt
 ```
 
+- in case your host machine is a remote server (lxd is running on remote), use the following snippet on host to redirect all connections to port `8200` to a single Vault agent's container
+
+```bash
+sudo iptables -t nat -A PREROUTING -i $(ip link | awk -F: '$0 !~ "lo|vir|wl|lxd|docker|^[^0-9]"{print $2;getline}') -p tcp --dport 8200 -j DNAT --to "$(lxc list --format json | jq -r '.[] | select((.name | contains ("vault")) and (.status=="Running")).state.network.eth0.addresses|.[] | select(.family=="inet").address' | head -n 1):8200"
+```
+
 - decrypt  `vault_root_token`
 
 ```bash
-ansible localhost -m debug -a var="vault_root_token" -e "@host_vars/vault_root_token.yml" --vault-password-file ~/.vault_pass.txt
+ansible localhost \
+  -m debug \
+  -a var="vault_root_token" \
+  -e "@host_vars/vault_root_token.yml" \
+  --vault-password-file ~/.vault_pass.txt
 ```
 - decrypt  `vault_unseal_keys_b64`
 
 ```bash
-ansible localhost -m debug -a var="vault_unseal_keys_b64" -e "@host_vars/vault_unseal_keys_b64.yml" --vault-password-file ~/.vault_pass.txt
+ansible localhost \
+  -m debug \
+  -a var="vault_unseal_keys_b64" \
+  -e "@host_vars/vault_unseal_keys_b64.yml" \
+  --vault-password-file ~/.vault_pass.txt
 ```
 
 - Setup Ansible Controller Software
 
 ```bash
 ansible-playbook \
-        -i staging \
-        --tags 01-ansible-controller \
-        site.yml
+  -i staging \
+  --tags 01-ansible-controller \
+  site.yml
 ```
 
 - Setup base dependencies for all inventory hosts
 
 ```bash
 ansible-playbook \
-        -i staging \
-        --tags 02-install-prerequisites \
-        site.yml
+  -i staging \
+  --tags 02-install-prerequisites \
+  site.yml
 ```
 
 - install Vault
 
 ```bash
 ansible-playbook \
-        -i staging \
-        -e vault_password_file=~/.vault_pass.txt \
-        --vault-password-file ~/.vault_pass.txt \
-        --limit staging \
-        --tags 03-install-vault \
-        site.yml
+  -i staging \
+  -e vault_password_file=~/.vault_pass.txt \
+  --vault-password-file ~/.vault_pass.txt \
+  --limit staging \
+  --tags 03-install-vault \
+  site.yml
 ```
 
 - generate certificates for Vault
 
 ```bash
 ansible-playbook \
-        -i staging \
-        -e vault_password_file=~/.vault_pass.txt \
-        --vault-password-file ~/.vault_pass.txt \
-        --limit staging \
-        --tags 04-vault-certificates \
-        site.yml
+  -i staging \
+  -e vault_password_file=~/.vault_pass.txt \
+  --vault-password-file ~/.vault_pass.txt \
+  --limit staging \
+  --tags 04-vault-certificates \
+  site.yml
 ```
 
 - configure Vault
 
 ```bash
 ansible-playbook \
-        -i staging \
-        -e vault_password_file=~/.vault_pass.txt \
-        --vault-password-file ~/.vault_pass.txt \
-        --limit staging \
-        --tags 05-configure-vault \
-        site.yml
+  -i staging \
+  -e vault_password_file=~/.vault_pass.txt \
+  --vault-password-file ~/.vault_pass.txt \
+  --limit staging \
+  --tags 05-configure-vault \
+  site.yml
 ```
 
 - unseal Vault
 
 ```bash
 ansible-playbook \
-        -i staging \
-        -e vault_password_file=~/.vault_pass.txt \
-        --vault-password-file ~/.vault_pass.txt \
-        --limit staging \
-        --tags 06-unseal-vault \
-        site.yml
+  -i staging \
+  -e vault_password_file=~/.vault_pass.txt \
+  --vault-password-file ~/.vault_pass.txt \
+  --limit staging \
+  --tags 06-unseal-vault \
+  site.yml
 ```
 
 ## references

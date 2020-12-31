@@ -1,0 +1,20 @@
+---
+
+- block:
+  - import_tasks: "00-asserts.yml"
+  - name: "Installing base dependencies"
+    include_tasks: 01-installer.yml
+    loop: 
+      - { name: ca-certificates}
+      - { name: curl}
+      - { name: jq}
+      - { name: wget}
+      - { name: sudo}
+      - { name: unzip}
+      - { name: apt-transport-https}
+      - { name: ca-certificates}
+      - { name: gnupg2}
+      - { name: software-properties-common}
+      - { name: ufw}
+  - import_tasks: "02-docker.yml"
+  become: yes

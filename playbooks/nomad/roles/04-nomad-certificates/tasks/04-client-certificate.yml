@@ -1,0 +1,39 @@
+---
+
+- stat:
+    path: "{{ certificate_root_dir }}/nomad/client.pem.enc"
+  register: "client_pem_enc"
+- stat:
+    path: "{{ certificate_root_dir }}/nomad/client-key.pem.enc"
+  register: "client_key_pem_enc"
+- stat:
+    path: "{{ certificate_root_dir }}/nomad/client.csr.enc"
+  register: "client_csr_enc"    
+- block:
+  - name : "removing leftover nomad client 'client.pem.enc'"
+    file: 
+      path: "{{ certificate_root_dir }}/nomad/client.pem.enc"
+      state: absent
+    when:
+      - client_pem_enc.stat.exists
+  - name : "removing leftover nomad client 'client-key.pem.enc'"
+    file: 
+      path: "{{ certificate_root_dir }}/nomad/client-key.pem.enc"
+      state: absent
+    when:
+      - client_key_pem_enc.stat.exists
+  - name : "removing leftover nomad client 'client.csr.enc'"
+    file: 
+      path: "{{ certificate_root_dir }}/nomad/client.csr.enc"
+      state: absent
+    when:
+      - client_csr_enc.stat.exists
+  - name: "Generating nomad client certificate"
+    shell: "echo '{}' | sudo cfssl gencert -ca={{ certificate_root_dir }}/nomad/ca.pem -ca-key={{ certificate_root_dir }}/nomad/ca-key.pem -config={{ cfssl_config_path }} -hostname='client.global.nomad,{{ public_ips }},{{ private_ips }},localhost,127.0.0.1' - | cfssljson -bare client"
+    args:
+      chdir: "{{ certificate_root_dir }}/nomad"
+  when: >
+    ca_pem_enc.stat.exists == False or
+    ca_key_pem_enc.stat.exists == False or
+    ca_csr_enc.stat.exists == False
+  run_once: true

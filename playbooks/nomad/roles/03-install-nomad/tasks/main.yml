@@ -1,0 +1,41 @@
+---
+
+
+- name: Assert variables
+  assert:
+    that:
+      - nomad_releases_base_url is defined
+      - install_nomad is defined
+- shell: |
+    curl -sL {{ nomad_releases_base_url }}/index.json | 
+    jq -r '.versions[].version' | 
+    sort -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n | 
+    grep -E -v 'ent|rc|beta' | 
+    tail -1
+  register: "latest_version"
+- name: check nomad executable is present
+  shell: "which nomad"
+  register: result
+  ignore_errors: true
+- block:
+  - name: "checking if latest nomad release is higher than installed version"
+    shell: |
+      nomad --version | 
+      grep -Po '\d+\.\d+\.\d+'
+    register: installed_version 
+  - set_fact:
+      install_nomad: "{{ installed_version.stdout !=  latest_version.stdout }}"
+  when: 
+    - result.rc == 0
+- block:
+  - name: 'downloading nomad v{{ latest_version.stdout }}'
+    unarchive:
+      src: "https://releases.hashicorp.com/nomad/{{ latest_version.stdout }}/nomad_{{ latest_version.stdout }}_linux_{{ architecture_map[ansible_architecture] }}.zip"
+      dest: "/usr/local/bin/"
+      mode: 0755
+      owner: "root"
+      group: "root"
+      remote_src: yes
+  become: yes
+  when: 
+    - install_nomad 

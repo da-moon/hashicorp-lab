@@ -1,0 +1,50 @@
+log_level = "{{ log_level }}"
+data_dir="{{ nomad_data_path }}"
+name = "{{ ansible_hostname }}|{{ private_ip }}"
+ports {
+  http = {{ nomad_api_port }}
+  rpc  = {{ nomad_cluster_port }}
+  serf = {{ nomad_gossip_port }}
+}
+bind_addr = "0.0.0.0" 
+advertise {
+  http = "{{ private_ip }}"
+  rpc  = "{{ private_ip }}"
+  serf = "{{ private_ip }}" 
+}
+server {
+  enabled          = true
+  bootstrap_expect = {{ play_hosts  | length }}
+  data_dir=  "{{ nomad_storage_path }}"
+  encrypt= "{{ gossip_encryption_key }}"
+  server_join {
+    retry_join = {{retry_join_ips}}
+    #retry_max = 3
+    retry_interval = "15s"
+  }
+}
+client {
+  enabled = false
+}
+
+telemetry {
+  publish_allocation_metrics = true
+  publish_node_metrics       = true
+  prometheus_metrics         = true
+}
+autopilot {
+    cleanup_dead_servers      = true
+    last_contact_threshold    = "200ms"
+    max_trailing_logs         = 250
+    server_stabilization_time = "10s"
+}
+{% if not nomad_tls_disable %}tls {
+
+  http = true
+  rpc  = true
+  ca_file   = "{{ nomad_tls_path }}/ca.pem"
+  cert_file = "{{ nomad_tls_path }}/server.pem"
+  key_file  = "{{ nomad_tls_path }}/server-key.pem"
+  verify_server_hostname=true
+  verify_https_client={% if nomad_ui %}false{% else %}true{% endif %}
+}{% endif %}

@@ -1,0 +1,3 @@
+---
+install_nomad: true
+nomad_releases_base_url: "https://releases.hashicorp.com/nomad"

@@ -1,0 +1,51 @@
+---
+- block:
+  - name: "Making sure older versions of Docker are not installed."
+    apt:
+      name:
+        - "docker"
+        - "docker-engine"
+        - "docker.io" 
+        - "containerd" 
+        - "runc"
+      state: absent
+      purge: true
+  - name : "adding docker repository gpg key"
+    apt_key:
+      url: "{{ docker_repository_gpg_url }}"
+      state: present  
+  - name : "adding docker repository source"
+    apt_repository:
+      repo: "{{ docker_linux_repository_source }}"
+      state: present
+      filename: docker
+      update_cache: yes
+  - name: "Installing docker"
+    apt:
+      update_cache: yes
+      pkg: 
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+      install_recommends: true
+      state: latest
+  - command: docker-compose --version
+    register: docker_compose_current_version
+    changed_when: false
+    failed_when: false
+  - shell: "curl -sL https://api.github.com/repos/docker/compose/releases/latest | jq -r '.tag_name'"
+    register: "docker_compose_version"
+  - name: "Removing existing docker-compose (v{{ docker_compose_version.stdout_lines[0] }} )"
+    file:
+      path: "/usr/local/bin/docker-compose"
+      state: absent
+    when: 
+      - docker_compose_current_version.stdout is defined
+      - docker_compose_version.stdout_lines[0] not in docker_compose_current_version.stdout
+  - name: "Installing Docker Compose v{{ docker_compose_version.stdout_lines[0] }}"
+    get_url:
+      url: https://github.com/docker/compose/releases/download/{{ docker_compose_version.stdout_lines[0] }}/docker-compose-Linux-{{ ansible_architecture }}
+      dest: "/usr/local/bin/docker-compose"
+      mode: 0755
+  become: yes
+  

@@ -1,0 +1,16 @@
+---
+
+
+nomad_api_port : "{{ lookup('env','NOMAD_API_PORT') | default('4646', true) }}"
+nomad_cluster_port : "{{ lookup('env','NOMAD_CLUSTER_PORT') | default('4647', true) }}"
+nomad_gossip_port : "{{ lookup('env','NOMAD_GOSSIP_PORT') | default('4648', true) }}"
+
+nomad_data_path : "{{ lookup('env','NOMAD_DATA_PATH') | default('/opt/nomad', true) }}"
+nomad_storage_path : "{{ lookup('env','NOMAD_STORAGE_PATH') | default('/opt/nomad/data', true) }}"
+nomad_tls_path : "{{ lookup('env','NOMAD_TLS_PATH') | default('/opt/nomad/tls', true) }}"
+nomad_plugins_path : "{{ lookup('env','NOMAD_PLUGINS_PATH') | default('/opt/nomad/plugins', true) }}"
+nomad_client_path : "{{ lookup('env','NOMAD_CLIENT_PATH') | default('/opt/nomad/client', true) }}"
+nomad_config_directory_path : "/etc/nomad.d"
+play_encrypted_vars_dir: "{{ inventory_dir+'/host_vars/'}}"
+cni_config_dir: "{{ lookup('env','CNI_CONFIG_DIR') | default('/opt/cni/config', true) }}"
+nomad_profile_path: "/etc/profile.d/nomad.sh"

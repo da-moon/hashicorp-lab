@@ -8,6 +8,10 @@
 
 [![asciicast](https://asciinema.org/a/BzL3tXTkGL8xqSF5UiqWyZajB.svg)](https://asciinema.org/a/BzL3tXTkGL8xqSF5UiqWyZajB)
 
+- [`vault lab`](playbooks/vault/README.md)
+
+[![asciicast](https://asciinema.org/a/ZawavjyMOMaYNBASzxrUPTtl7.svg)](https://asciinema.org/a/ZawavjyMOMaYNBASzxrUPTtl7)
+
 
 - [`ngrok`](https://ngrok.com) setup
 
@@ -18,4 +22,4 @@
 
 - [x] Vault Lab
 - [ ] Consul Lab
-- [ ] Nomad Lab
+- [x] Nomad Lab

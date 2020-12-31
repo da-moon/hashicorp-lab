@@ -1,0 +1,8 @@
+[staging-servers]
+nomad-server-1
+nomad-server-2
+nomad-server-3
+[staging-clients]
+nomad-client-1
+nomad-client-2
+nomad-client-3

@@ -1,0 +1,57 @@
+log_level = "{{ log_level }}"
+data_dir="{{ nomad_data_path }}"
+name = "{{ ansible_hostname }}|{{ private_ip }}"
+ports {
+  http = {{ nomad_api_port }}
+  rpc  = {{ nomad_cluster_port }}
+  serf = {{ nomad_gossip_port }}
+}
+bind_addr = "0.0.0.0" 
+advertise {
+  http = "{{ private_ip }}"
+  rpc  = "{{ private_ip }}"
+  serf = "{{ private_ip }}" 
+}
+client {
+  enabled          = true
+  state_dir=  "{{ nomad_client_path }}"
+  options {
+    # docker.auth.config = "/root/.docker/config.json"
+    # docker.privileged.enabled = true
+    driver.raw_exec.enable = "1"
+    driver.whitelist = "docker,exec,raw_exec"
+    user.blacklist = "root"
+  }
+  # binding ssl certs
+  host_volume "ca-certificates" {
+    path = "/etc/ssl/certs"
+    read_only = true
+  }
+  server_join {
+    retry_join = {{retry_join_ips}}
+    retry_max = 3
+    retry_interval = "15s"
+  }
+}
+server {
+  enabled = false
+}
+
+telemetry {
+  publish_allocation_metrics = true
+  publish_node_metrics       = true
+  prometheus_metrics         = true
+}
+autopilot {
+    last_contact_threshold    = "200ms"
+    max_trailing_logs         = 250
+}
+{% if not nomad_tls_disable %}tls {
+
+  http = true
+  rpc  = true
+  ca_file   = "{{ nomad_tls_path }}/ca.pem"
+  cert_file = "{{ nomad_tls_path }}/client.pem"
+  key_file  = "{{ nomad_tls_path }}/client-key.pem"
+  verify_https_client={% if nomad_ui %}false{% else %}true{% endif %}
+}{% endif %}

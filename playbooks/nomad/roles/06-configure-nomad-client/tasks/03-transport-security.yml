@@ -1,0 +1,13 @@
+---
+- block:
+  - name: "uploading nomad client certificates " 
+    copy: 
+      src: "{{ certificate_root_dir }}/nomad/{{ item }}.enc"
+      dest: "{{ nomad_tls_path }}/{{ item }}"
+      force: yes
+      decrypt: yes
+      owner: nomad
+    loop: ['ca.pem','client.pem','client-key.pem'] 
+  become: yes
+  when :
+    - not nomad_tls_disable

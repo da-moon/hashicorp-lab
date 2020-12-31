@@ -1,0 +1,4 @@
+---
+
+private_ips: "{% for host in ansible_play_hosts %}{{hostvars[host].ansible_default_ipv4.address}}{% if not loop.last %},{% endif %}{% endfor %}"
+public_ips: "{{ ansible_play_hosts| join(',')  }}"

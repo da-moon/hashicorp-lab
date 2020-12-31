@@ -1,0 +1,64 @@
+---
+- block :
+  - name: "cleaning up past setup directories"
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+        - '{{ nomad_data_path }}'
+        - '{{ nomad_storage_path }}'
+        - '{{ nomad_config_directory_path }}'
+        - '{{ nomad_plugins_path }}'
+        - '{{ nomad_client_path }}'
+        - '{{ nomad_tls_path }}'
+        - '{{ cni_config_dir }}'
+
+  - name: "making sure nomad config directories are present on remote"
+    file:
+      path: "{{ item }}"
+      state: directory
+      group : "root"
+      owner: "root"
+      mode: '0755'
+    with_items:
+        - '{{ nomad_tls_path }}'
+        - '{{ nomad_config_directory_path }}'
+        - '{{ systemd_unit_directory }}'
+  - name: "making sure certificate directories for retry_join nodes are present on client"
+    file:
+      path: "{{ nomad_config_directory_path }}/certificates/{{ item }}"
+      state: directory
+      group : "root"
+      owner: "root"
+      mode: '0755'
+    with_items: "{{ retry_join_ips }}"
+    when:
+      - nomad_tls_disable is defined
+      - not nomad_tls_disable
+  - name: "Ensure group 'nomad' exists"
+    group:
+      name: nomad
+      state: present
+  - name: "Ensure system user 'nomad' exists"
+    user: 
+      state: present
+      shell: /bin/bash
+      system: yes
+      name: "nomad" 
+      group: "nomad"
+  - name: "making sure nomad data directories are present on remote and have proper permissions"
+    file:
+      path: "{{ item }}"
+      state: directory
+      group : "nomad"
+      owner: "nomad"
+      mode: '0755'
+    with_items:
+        - '{{ nomad_data_path }}'
+        - '{{ nomad_storage_path }}'
+        - '{{ nomad_config_directory_path }}'
+        - '{{ nomad_plugins_path }}'
+        - '{{ nomad_client_path }}'
+        - '{{ nomad_tls_path }}'
+        - '{{ cni_config_dir }}'
+  become: yes

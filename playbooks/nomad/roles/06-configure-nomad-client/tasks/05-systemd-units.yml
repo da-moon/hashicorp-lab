@@ -1,0 +1,35 @@
+---
+- block :
+  - find:
+      paths: ["{{ nomad_config_directory_path }}"]
+      file_type: file
+      use_regex: yes
+      patterns: ['^.*\.hcl$']
+    register: "hcl_config_filelist"
+    run_once: true
+  - set_fact:
+      hcl_config_filelist: > 
+        {{ 
+          hcl_config_filelist.files | 
+          map(attribute='path')  | 
+          list 
+        }}
+  - name: "uploading nomad systemd service file"
+    template: 
+      src: "service/nomad.service.j2"
+      dest: "{{ systemd_unit_directory }}/nomad-client.service"
+      force: yes
+      decrypt: yes
+
+  - block:
+    - name: "reloading systemctl"
+      command: "systemctl daemon-reload"
+    - name: "making sure nomad-client service runs at startup"
+      command: "systemctl enable --now nomad-client"
+    - name: "making sure nomad-client service is not stopped"
+      command: "systemctl start nomad-client"
+    - name: "restarting nomad-client service"
+      command: "systemctl restart nomad-client"
+    - name: "make sure nomad-client service is really running"
+      command: "systemctl is-active nomad-client"
+  become: yes
