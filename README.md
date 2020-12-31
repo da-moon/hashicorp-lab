@@ -8,7 +8,7 @@
 
 [![asciicast](https://asciinema.org/a/BzL3tXTkGL8xqSF5UiqWyZajB.svg)](https://asciinema.org/a/BzL3tXTkGL8xqSF5UiqWyZajB)
 
-- [`vault lab`](playbooks/vault/README.md)
+- [`nomad lab`](playbooks/nomad/README.md)
 
 [![asciicast](https://asciinema.org/a/ZawavjyMOMaYNBASzxrUPTtl7.svg)](https://asciinema.org/a/ZawavjyMOMaYNBASzxrUPTtl7)
 
