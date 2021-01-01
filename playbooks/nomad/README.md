@@ -24,7 +24,13 @@ echo -n "$(dd if=/dev/urandom bs=64 count=1 status=none | base64)" | tee ~/.vaul
 - in case your host machine is a remote server (lxd is running on remote), use the following snippet on host to redirect all connections to port `4646` to a nomad server's container
 
 ```bash
-sudo iptables -t nat -A PREROUTING -i $(ip link | awk -F: '$0 !~ "lo|vir|wl|lxd|docker|^[^0-9]"{print $2;getline}') -p tcp --dport 4646 -j DNAT --to "$(lxc list --format json | jq -r '.[] | select((.name | contains ("server")) and (.status=="Running")).state.network.eth0.addresses|.[] | select(.family=="inet").address' | head -n 1):4646"
+lxc config device add "nomad-server-1" "proxy-nomad-server-1" proxy listen=tcp:0.0.0.0:4646 connect=tcp:127.0.0.1:4646
+```
+
+remove the proxy with the following snippet :
+
+```bash
+lxc config device remove "nomad-server-1" "proxy-nomad-server-1"
 ```
 
 - Setup Ansible Controller Software

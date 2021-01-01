@@ -37,7 +37,6 @@ remove the proxy with the following snippet :
 lxc config device remove "vault-1" "proxy-vault-1"
 ```
 
-
 - decrypt  `vault_root_token`
 
 ```bash

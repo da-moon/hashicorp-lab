@@ -7,10 +7,6 @@ $(LXD_TARGETS):
 	- $(eval command=lxd-debian)
 	- $(eval command=$(command) --name '$(name)')
 	- $(eval command=$(command) --ssh-config)
-	- $(eval command=$(command) --python)
-	- $(eval command=$(command) --starship)
-	- $(eval command=$(command) --rg)
-	- $(eval command=$(command) --spacevim)
 	- @$(MAKE) --no-print-directory \
 	 -f $(THIS_FILE) shell cmd="${command}"
 ifneq ($(DELAY),)

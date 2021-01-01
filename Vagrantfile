@@ -36,6 +36,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell",privileged:false,name:"goenv", path: "contrib/vagrant/provision/goenv.sh"
   config.vm.provision "shell",privileged:false,name:"levant", path: "contrib/vagrant/provision/levant.sh"
   config.vm.provision "shell",privileged:false,name:"spacevim", path: "contrib/vagrant/provision/spacevim.sh"
+  config.vm.provision "shell",privileged:true,name:"hashicorp", path: "contrib/vagrant/provision/hashicorp.sh"
   config.vm.provision "shell",privileged:true,name:"ripgrep", path: "contrib/vagrant/provision/ripgrep.sh"
   config.vm.provision "shell",privileged:true,name:"docker", path: "contrib/vagrant/provision/docker.sh"
   config.vm.provision "shell",privileged:true,name:"lxd", path: "contrib/vagrant/provision/lxd.sh"

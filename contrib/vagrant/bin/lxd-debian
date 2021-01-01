@@ -165,7 +165,6 @@ function provision_base(){
 	cat << EOF | lxc exec "${container_name}" -- bash --
 apt-get update
 apt-get install -yqq sudo apt-utils curl wget ca-certificates gnupg2 git jq openssh-server
-apt-get install -yqq ncdu tmux neofetch build-essential xfonts-utils parallel unzip
 EOF
   log_info "'$container_name' container : creating user '$username' with password '$username'"
 	cat << EOF | lxc exec "${container_name}" -- bash --
