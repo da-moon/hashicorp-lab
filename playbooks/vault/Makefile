@@ -22,6 +22,7 @@ include ../../contrib/make/targets/lxd/lxd.mk
 
 THIS_FILE := $(firstword $(MAKEFILE_LIST))
 SELF_DIR := $(dir $(THIS_FILE))
+TAGS:=$(shell cat site.yml | yq '.[].roles[]?.tags[]?')
 .PHONY: $(PROJECT_NAME)
 .SILENT: $(PROJECT_NAME)
 $(PROJECT_NAME): $(PROJECT_NAME)-inventories 
@@ -48,8 +49,6 @@ $(PROJECT_NAME)-inventories:
 	- echo '[staging:children]' | tee -a $(SELF_DIR)/staging > /dev/null
 	- echo 'lxc' | tee -a $(SELF_DIR)/staging > /dev/null
 	- $(call print_completed_target)
-
-
 .PHONY: $(PROJECT_NAME)-containers
 .SILENT: $(PROJECT_NAME)-containers
 $(PROJECT_NAME)-containers:
@@ -61,4 +60,14 @@ $(PROJECT_NAME)-containers:
 $(PROJECT_NAME)-clean:
 	- $(call print_running_target)
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) $(LXD_CLEAN_TARGETS)
+	- $(call print_completed_target)
+.PHONY:info
+.SILENT: info
+info:
+	- $(info $(TAGS))
+
+.PHONY:$(TAGS)
+.SILENT:$(TAGS)
+$(TAGS):
+	- $(call print_running_target)
 	- $(call print_completed_target)

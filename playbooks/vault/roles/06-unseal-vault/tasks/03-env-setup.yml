@@ -72,6 +72,10 @@
     command: "systemctl daemon-reload"
   - name: "restarting vault service"
     command: "systemctl restart vault"
+    ignore_errors: true
+  - pause:
+      seconds: 30
+      prompt: waiting for vault server to start and become available
   - name: "make sure vault service is really running"
     command: "systemctl is-active vault"
   become: yes

@@ -7,6 +7,7 @@ set -o pipefail
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 # passwordless sudo
 sudo sed -i.bak -e 's/%sudo\s\+ALL=(ALL\(:ALL\)\?)\s\+ALL/%sudo ALL=NOPASSWD:ALL/g' /etc/sudoers
+sudo usermod -m -d /vagrant vagrant
 if [ -n "$(command -v apt-get)" ]; then
   # echo "*** Detected apt-based Linux"
   export DEBIAN_FRONTEND=noninteractive

@@ -25,28 +25,36 @@ ansible -i staging -m ping all -vvv
 echo -n "$(dd if=/dev/urandom bs=64 count=1 status=none | base64)" | tee ~/.vault_pass.txt
 ```
 
-- in case your host machine is a remote server (lxd is running on remote), use the following snippet on host to redirect all connections to port `8200` to a single Vault agent's container
+-  in case your host machine is a remote server (lxd is running on remote), you might want to access vault api at `https://localhost:8200`. use the following snippet on host to redirect all connections to port `8200` to a single Vault agent's container
 
 ```bash
-sudo iptables -t nat -A PREROUTING -i $(ip link | awk -F: '$0 !~ "lo|vir|wl|lxd|docker|^[^0-9]"{print $2;getline}') -p tcp --dport 8200 -j DNAT --to "$(lxc list --format json | jq -r '.[] | select((.name | contains ("vault")) and (.status=="Running")).state.network.eth0.addresses|.[] | select(.family=="inet").address' | head -n 1):8200"
+lxc config device add "vault-1" "proxy-vault-1" proxy listen=tcp:0.0.0.0:8200 connect=tcp:127.0.0.1:8200
 ```
+
+remove the proxy with the following snippet :
+
+```bash
+lxc config device remove "vault-1" "proxy-vault-1"
+```
+
 
 - decrypt  `vault_root_token`
 
 ```bash
-ansible localhost \
+find -name vault_root_token.yml | xargs -I {} ansible localhost \
   -m debug \
   -a var="vault_root_token" \
-  -e "@host_vars/vault_root_token.yml" \
+  -e "@{}" \
   --vault-password-file ~/.vault_pass.txt
 ```
+
 - decrypt  `vault_unseal_keys_b64`
 
 ```bash
-ansible localhost \
+find -name vault_unseal_keys_b64.yml | xargs -I {} ansible localhost \
   -m debug \
   -a var="vault_unseal_keys_b64" \
-  -e "@host_vars/vault_unseal_keys_b64.yml" \
+  -e "@{}" \
   --vault-password-file ~/.vault_pass.txt
 ```
 
