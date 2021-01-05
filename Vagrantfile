@@ -25,8 +25,8 @@ Vagrant.configure("2") do |config|
     override.vm.box = "generic/debian10"
     override.vm.synced_folder ".", "/vagrant/#{NAME}", owner: "vagrant",group: "vagrant", type: "virtualbox"
   end
-  config.vm.provision "file",source: "contrib/vagrant/bin", destination: "/tmp/bin"
   config.vm.provision "shell",privileged:true,name:"cleanup", inline: $cleanup_script
+  config.vm.provision "file",source: "contrib/vagrant/bin", destination: "/tmp/bin"
   config.vm.provision "shell",privileged:false,name:"init", path: "contrib/vagrant/provision/init.sh"
   config.vm.provision "shell",privileged:true,name:"node", path: "contrib/vagrant/provision/node.sh"
   config.vm.provision "shell",privileged:false,name:"python", path: "contrib/vagrant/provision/python.sh"
