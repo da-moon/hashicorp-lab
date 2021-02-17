@@ -1,0 +1,31 @@
+---
+- block :
+  - find:
+      paths: ["{{ consul_replicate_user_home_path }}"]
+      file_type: file
+      use_regex: yes
+      patterns: ['^.*\.hcl$']
+    register: "hcl_config_filelist"
+    run_once: true
+  - set_fact:
+      hcl_config_filelist: > 
+        {{ 
+          hcl_config_filelist.files | 
+          map(attribute='path')  | 
+          list 
+        }}
+  - block:
+    - name: "uploading consul-replicate systemd service file"
+      template: 
+        src: "service/consul-replicate.service.j2"
+        dest: "{{ systemd_unit_directory }}/consul-replicate.service"
+        force: yes
+        decrypt: yes
+      notify:
+        - Restart consul-replicate
+    - pause:
+        seconds: 30
+        prompt: "waiting for consul-replicate service to start/restart and become available"
+    - name: "make sure consul-replicate service is really running"
+      command: "systemctl is-active consul-replicate"
+    become: yes

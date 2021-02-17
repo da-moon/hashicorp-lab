@@ -2,8 +2,9 @@
 
 - block:
   - import_tasks: "00-asserts.yml"
+  - import_tasks:  "01-initialize.yml"
   - name: "Installing base dependencies"
-    include_tasks: 01-installer.yml
+    include_tasks: installer.yml
     loop: 
       - { name: ca-certificates}
       - { name: curl}
@@ -14,6 +15,7 @@
       - { name: apt-transport-https}
       - { name: ca-certificates}
       - { name: gnupg2}
+      - { name: iptables}
       - { name: software-properties-common}
       - { name: ufw}
   - import_tasks: "02-envoy.yml"

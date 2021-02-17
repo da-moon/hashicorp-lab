@@ -1,0 +1,62 @@
+---
+
+- hosts: all
+  gather_facts: no
+  pre_tasks:
+  - name: "Asserting variables globally used variables"
+    assert:
+      that:
+        - architecture_map is defined
+        - systemd_unit_directory is defined
+  - block :
+    - name: check python executable is present
+      shell: "which python"
+      register: result
+      ignore_errors: true
+    - name: 'install python'
+      raw: 'apt-get install -yqq python'
+      when: result.rc != 0
+    - name: check python-apt is installed
+      shell: "dpkg -l | grep python-apt"
+      register: result
+      ignore_errors: true
+    - name: 'install python-apt'
+      raw: 'apt-get install -yqq python-apt'
+      when: result.rc != 0
+  become: yes
+- name: consul-template setup playbooks
+  hosts: staging
+  gather_facts: yes
+  vars_prompt:
+  - name: vault_password_file
+    prompt: Where is ansible-vault password file?
+    private: no
+  vars:
+    vault_tls_disable : false
+    override_certificate: true
+    certificate_root_dir: "{{ inventory_dir+'/host_vars/certificates'}}"
+  roles:
+    - { role: 01-install-prerequisites, tags: ["02-install-prerequisites"]}  
+    - { role: 02-install-consul-template, tags: ["02-install-consul-template"]}       
+    - role: 03-configure-consul-template 
+      tags: 
+        - "03-configure-consul-template" 
+      vars:
+        consul_addr: "http://consul-server-1:8500"
+        consul_token: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          37323737613161363033323262646632666432623463333861313136343161396239656366313263
+          3566633065643331323538366231356435623835616432620a633762333837656336363834383664
+          38353866323161303730363139643333353234366462653431343665616366306639366165353534
+          6630376462623732640a313935653039643562336634336239636134633364316137643236636366
+          32336666333135373135616534613731343663633661643035383834643162623061333534373031
+          3432616161393764316634626130343263663639356435396433
+        vault_addr: "https://vault-1:8200"
+        vault_token: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          65323866623234306237373864306362396133373533373030316632343931333635306233386361
+          6535363461653864326135356535616232373637373134390a393262616665343039653266663962
+          62323232633638393430353865386135653563633466653561383831643631666135323635646633
+          3066383831336634360a306437666437373935303230613531363064643935383063643030613364
+          61616364656532393631616466303833343431376436643836393735313561313737
+

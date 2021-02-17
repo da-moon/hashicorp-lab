@@ -1,0 +1,11 @@
+{% if log_level is defined %}log_level    = "[[ log_level ]]"
+{% endif %}
+pid_file = "/var/run/consul-template.pid"
+reload_signal = "SIGHUP"
+kill_signal = "SIGINT"
+max_stale = "10m"
+block_query_wait = "60s"
+wait {
+  min = "5s"
+  max = "10s"
+}

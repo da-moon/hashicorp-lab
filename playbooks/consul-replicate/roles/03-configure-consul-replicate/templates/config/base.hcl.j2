@@ -1,0 +1,16 @@
+{% if log_level is defined and log_level != "" %}log_level    = "{{ log_level }}"
+{% endif %}
+pid_file = "/var/run/consul-replicate.pid"
+reload_signal = "SIGHUP"
+kill_signal = "SIGINT"
+max_stale = "10m"
+wait {
+  min = "5s"
+  max = "10s"
+}
+reload_signal = "SIGHUP"
+status_dir = "service/consul-replicate/statuses"
+syslog {
+  enabled = true
+  facility = "LOCAL5"
+}

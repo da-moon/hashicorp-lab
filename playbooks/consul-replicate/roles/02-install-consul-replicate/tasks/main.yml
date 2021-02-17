@@ -1,0 +1,71 @@
+---
+
+- name: Assert variables
+  assert:
+    that:
+      - consul_replicate_releases_base_url is defined and consul_replicate_releases_base_url != ""
+      - consul_replicate_install_dir is defined and consul_replicate_install_dir != ""
+
+- block:
+  - block:
+    - shell: |
+        curl -sL {{ consul_replicate_releases_base_url }}/index.json |
+        jq -r '.versions[].version' |
+        sort -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n |
+        grep -E -v 'ent|rc|beta' |
+        tail -1
+      register: "latest_version"
+    when: 
+      - consul_replicate_version is not defined or consul_replicate_version == ""
+  - block:
+    - set_fact:
+        consul_replicate_version: "{{ latest_version.stdout }}"
+    when: 
+      - latest_version is defined and latest_version.stdout is defined and latest_version.stdout != ""
+  - name: "Forcefully triggering override of existing consul-template installation"
+    set_fact:
+      install_consul_replicate: true
+    when: 
+      - override_consul_replicate_install is defined 
+      - override_consul_replicate_install == true
+  - name: "checking to see if we have to install consul-replicate"
+    block: 
+    - name: check consul-replicate executable is present
+      shell: "which consul-replicate"
+      register: result
+      ignore_errors: true
+    - block:
+      - name: "checking if requested consul-replicate release is different from installed version"
+        shell: |
+          consul-replicate --version | 
+          grep -Po '\d+\.\d+\.\d+'
+        register: installed_version 
+      - set_fact:
+          install_consul_replicate: "{{ installed_version.stdout !=  latest_version.stdout }}"
+      when: 
+        - result.rc == 0
+    when: 
+      - override_consul_replicate_install is not defined or override_consul_replicate_install == false
+  - block:
+    - set_fact:
+        consul_replicate_download_url: "https://releases.hashicorp.com/consul-replicate/{{ consul_replicate_version }}/consul-replicate_{{ consul_replicate_version }}_linux_{{ architecture_map[ansible_architecture] }}.zip"
+
+    - name: 'downloading consul-replicate v{{ consul_replicate_version }}'
+      unarchive:
+        src: "{{ consul_replicate_download_url }}"
+        dest: "{{ consul_replicate_install_dir }}"
+        mode: 0755
+        owner: "root"
+        group: "root"
+        remote_src: yes
+      when:
+        - consul_replicate_download_url is defined
+    become: yes
+    when: 
+      -  (override_consul_replicate_install is defined and override_consul_replicate_install == true ) or install_consul_replicate
+  - shell: "which consul-replicate"
+    register: result
+  - fail:
+      msg: "consul-template install was faulty and the executable is not in PATH."
+    when: 
+      - result.rc != 0

@@ -1,7 +1,7 @@
 - block:
   - name: "bootstraping consul acl"
     shell: |
-      sleep 10 && consul acl bootstrap -http-addr=http{% if not consul_tls_disable %}s{% endif %}://127.0.0.1:{% if consul_tls_disable %}{{ consul_api_port }}{% else %}{{ consul_https_api_port }} -ca-path='{{ consul_user_home_path }}/ca.pem' \
+      consul acl bootstrap -http-addr=http{% if not consul_tls_disable %}s{% endif %}://127.0.0.1:{% if consul_tls_disable %}{{ consul_api_port }}{% else %}{{ consul_https_api_port }} -ca-path='{{ consul_user_home_path }}/ca.pem' \
         -client-cert='{{ consul_user_home_path }}/cli.pem' \
         -client-key='{{ consul_user_home_path }}/cli-key.pem' \
       {% endif %} -format=json

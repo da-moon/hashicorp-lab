@@ -1,0 +1,36 @@
+---
+- block :
+  - find:
+      paths: ["{{ consul_template_user_home_path }}"]
+      file_type: file
+      use_regex: yes
+      patterns: ['^.*\.hcl$']
+    register: "hcl_config_filelist"
+    run_once: true
+  - set_fact:
+      hcl_config_filelist: > 
+        {{ 
+          hcl_config_filelist.files | 
+          map(attribute='path')  | 
+          list 
+        }}
+  - name: "uploading consul-template systemd service file"
+    template: 
+      src: "service/consul-template.service.j2"
+      dest: "{{ systemd_unit_directory }}/consul-template.service"
+      force: yes
+      decrypt: yes
+  - block:
+    - name: "reloading systemctl"
+      command: "systemctl daemon-reload"
+    - name: "making sure consul-template service runs at startup"
+      command: "systemctl enable --now consul-template"
+    - name: "restarting consul-template service"
+      command: "systemctl restart consul-template"
+      ignore_errors: true
+    - pause:
+        seconds: 30
+        prompt: waiting for consul-template server to start and become available
+    - name: "make sure consul-template service is really running"
+      command: "systemctl is-active consul-template"
+  become: yes

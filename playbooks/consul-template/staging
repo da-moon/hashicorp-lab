@@ -1,0 +1,4 @@
+[lxc]
+consul-template
+[staging:children]
+lxc

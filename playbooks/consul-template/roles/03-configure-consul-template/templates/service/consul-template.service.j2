@@ -1,0 +1,52 @@
+[Unit]
+Description=Consul Template Systemd Unit
+Requires=network-online.target
+After=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=simple
+# User=consul-template
+# Group=consul-template
+User=root
+Group=root
+
+MemoryAccounting=true
+MemoryHigh=1024M
+MemoryMax=2048M
+# ensuring /usr , /boot , /efi is mounted as readonly
+ProtectSystem=true
+# ensuring /home/, /root, and /run/user are in readonly mode.
+# this is in case consul template needs to read pid under /run/user
+# to send signals to process
+ProtectHome=read-only
+PrivateTmp=true
+NoNewPrivileges=true
+SecureBits=keep-caps
+AmbientCapabilities=CAP_IPC_LOCK
+Capabilities=CAP_IPC_LOCK+ep
+CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+WorkingDirectory=/etc/consul-template
+
+ExecStart=/usr/local/bin/consul-template \
+{% for item in hcl_config_filelist %}
+    -config={{ item }}{% if not loop.last %} \
+{% endif %}{% endfor %}
+
+# BEGIN ANSIBLE MANAGED BLOCK
+# END ANSIBLE MANAGED BLOCK
+
+ExecReload=/bin/kill --signal HUP $MAINPID
+KillMode=process
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+StartLimitInterval=60
+StartLimitBurst=3
+LimitNOFILE=65536
+LimitMEMLOCK=infinity
+
+[Install]
+WantedBy=multi-user.target

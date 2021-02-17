@@ -30,12 +30,10 @@
 - block:
   - name: 'downloading consul v{{ latest_version.stdout }}'
     unarchive:
-      src: "{{ releases_base_url }}/consul/{{ latest_version.stdout }}/consul_{{ latest_version.stdout }}_linux_{{ architecture_map[ansible_architecture] }}.zip"
+      src: "https://releases.hashicorp.com/consul/{{ latest_version.stdout }}/consul_{{ latest_version.stdout }}_linux_{{ architecture_map[ansible_architecture] }}.zip"
       dest: "/usr/local/bin/"
       mode: 0755
       owner: "root"
       group: "root"
       remote_src: yes
   become: yes
-  when: 
-    - install_consul

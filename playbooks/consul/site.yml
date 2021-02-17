@@ -23,13 +23,13 @@
       raw: 'apt-get install -yqq python-apt'
       when: result.rc != 0
   become: yes
-# - name: shared tasks
-  # hosts: all
-  # gather_facts: yes
-  # roles:
-    # - { role: 01-ansible-controller, tags: ["01-ansible-controller"]}  
-    # - { role: 02-install-prerequisites, tags: ["02-install-prerequisites"]}  
-    # - { role: 03-install-consul, tags: ["03-install-consul"]}
+- name: shared tasks
+  hosts: all
+  gather_facts: yes
+  roles:
+    - { role: 01-ansible-controller, tags: ["01-ansible-controller"]}  
+    - { role: 02-install-prerequisites, tags: ["02-install-prerequisites"]}  
+    - { role: 03-install-consul, tags: ["03-install-consul"]}
 - name: Hashicorp Consul Cluster setup playbooks
   hosts: staging-servers
   gather_facts: yes

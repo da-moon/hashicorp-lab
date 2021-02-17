@@ -1,0 +1,17 @@
+{% if vault_addr is defined %}vault {
+  address = "[[ vault_addr ]]"
+  token = "[[ vault_token ]]"
+  {% if vault_namespace is defined %}namespace = "[[ vault_namespace ]]"{% endif %}
+  retry {
+      enabled = true
+      attempts = 12
+      backoff = "250ms"
+      max_backoff = "30s"
+  }
+  ssl {
+    enabled = false
+    verify = false
+  }
+  renew_token = false
+  unwrap_token = false
+}{% endif %}

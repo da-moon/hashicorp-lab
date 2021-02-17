@@ -14,6 +14,11 @@
       - { name: mkbundle}
       - { name: multirootca}
   - include_tasks: 01-consul.yml
+  - name: "Randomly generating and encrypting passwords and secrets"
+    include_tasks: encrypted-rand.yml
+    loop:
+      - { name: gossip_encryption_key}
+
   delegate_to: localhost
   when: ansible_facts['os_family'] == "Debian"
   become: yes

@@ -1,0 +1,22 @@
+---
+
+consul_addr: "{{ lookup('env','CONSUL_HTTP_ADDR') }}"
+consul_token: "{{ lookup('env','CONSUL_HTTP_TOKEN') }}"
+consul_namespace:  "{{ lookup('env','CONSUL_NAMESPACE') }}"
+log_level : "{{ lookup('env','CONSUL_REPLICATE_LOG_LEVEL') | default('ERROR', true) }}"
+
+# SSL related vars
+ssl_enabled: "{{ lookup('env','CONSUL_REPLICATE_SSL_ENABLED') | default(false, true) }}"
+ssl_verify: "{{ lookup('env','CONSUL_REPLICATE_SSL_VERIFY') | default(false, true) }}"
+ssl_cert: "{{ lookup('env','CONSUL_REPLICATE_SSL_CERT') }}"
+ssl_key: "{{ lookup('env','CONSUL_REPLICATE_SSL_KEY') }}"
+ssl_ca_cert: "{{ lookup('env','CONSUL_REPLICATE_SSL_CA_CERT') }}"
+ssl_ca_path: "{{ lookup('env','CONSUL_REPLICATE_SSL_CA_PATH') }}"
+ssl_server_name: "{{ lookup('env','CONSUL_REPLICATE_SSL_SERVER_NAME') }}"
+
+# Replication related variables
+
+prefix_source: "{{ lookup('env','CONSUL_REPLICATE_PREFIX_SOURCE') }}"
+prefix_datacenter: "{{ lookup('env','CONSUL_REPLICATE_PREFIX_DATACENTER') }}"
+prefix_destination: "{{ lookup('env','CONSUL_REPLICATE_PREFIX_DESTINATION') }}"
+exclude_sources: "{{ lookup('env','CONSUL_REPLICATE_EXCLUDE_SOURCES') }}"

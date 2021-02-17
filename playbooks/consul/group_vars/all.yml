@@ -11,5 +11,4 @@ architecture_map:
 ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
 systemd_unit_directory: "/usr/lib/systemd/system"
 vault_password_file: "~/.vault_pass.txt"
-# BEGIN ANSIBLE MANAGED BLOCK
-# END ANSIBLE MANAGED BLOCK
+play_encrypted_vars_dir: "{{ inventory_dir+'/group_vars/'}}"

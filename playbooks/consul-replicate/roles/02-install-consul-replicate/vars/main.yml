@@ -1,0 +1,3 @@
+---
+consul_replicate_version: "{{ lookup('env','CONSUL_REPLICATE_INSTALL_VERSION') }}"
+override_consul_replicate_install: "{{ lookup('env','OVERRIDE_CONSUL_REPLICATE_INSTALL') | default(false, true) }}"

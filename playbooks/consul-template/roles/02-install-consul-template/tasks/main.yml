@@ -1,0 +1,23 @@
+---
+
+- name: Assert variables
+  assert:
+    that:
+      - consul_template_releases_base_url is defined
+- shell: |
+    curl -sL {{ consul_template_releases_base_url }}/index.json | 
+    jq -r '.versions[].version' | 
+    sort -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n | 
+    grep -E -v 'ent|rc|beta' | 
+    tail -1
+  register: "latest_version"
+- block:
+  - name: 'downloading consul-template v{{ latest_version.stdout }}'
+    unarchive:
+      src: "https://releases.hashicorp.com/consul-template/{{ latest_version.stdout }}/consul-template_{{ latest_version.stdout }}_linux_{{ architecture_map[ansible_architecture] }}.zip"
+      dest: "/usr/local/bin/"
+      mode: 0755
+      owner: "root"
+      group: "root"
+      remote_src: yes
+  become: yes

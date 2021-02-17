@@ -1,0 +1,7 @@
+---
+    
+- block:
+  - import_tasks:  "00-asserts.yml"
+  - import_tasks:  "01-initialize.yml"
+  - import_tasks:  "02-config-files.yml"
+  - import_tasks:  "03-systemd-units.yml"

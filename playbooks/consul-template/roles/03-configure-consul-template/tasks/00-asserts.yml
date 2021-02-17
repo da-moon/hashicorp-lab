@@ -1,0 +1,8 @@
+---
+
+- name: Assert variables
+  assert:
+    that:
+      - systemd_unit_directory is defined
+      - play_encrypted_vars_dir is defined
+      - consul_template_user_home_path is defined

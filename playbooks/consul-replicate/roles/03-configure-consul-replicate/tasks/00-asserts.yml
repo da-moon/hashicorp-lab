@@ -1,0 +1,31 @@
+---
+
+
+- name: "Assert Generic variables"
+  assert:
+    that:
+      - architecture_map is defined
+      - systemd_unit_directory is defined and systemd_unit_directory != ""
+      - consul_replicate_user_home_path is defined and consul_replicate_user_home_path != ""
+      - consul_replicate_install_dir is defined and consul_replicate_install_dir != ""
+      - consul_addr is defined and consul_addr != ""
+      - consul_token is defined and consul_token != ""
+      - ssl_enabled is defined
+      - ssl_verify is defined
+      - ssl_cert is defined
+      - ssl_key is defined
+      - ssl_server_name is defined
+      - exclude_sources is defined
+      - prefix_source is defined and prefix_source != ""
+      - prefix_datacenter is defined and prefix_datacenter != ""
+      - prefix_destination is defined and prefix_destination != ""
+
+- name: "Ensuring SSL related variables are not empty strings"
+  assert:
+    that:
+      - ssl_cert != ""
+      - ssl_key != ""
+      - (ssl_ca_cert is defined and ssl_ca_cert != "") or (ssl_ca_path is defined and ssl_ca_path != "")
+  when:
+    - ssl_enabled is defined and ssl_enabled == true
+

@@ -1,0 +1,24 @@
+---
+- block :
+  - name: "ensuring user systemd directory exits"
+    file:
+      path: "{{ item }}"
+      state: directory
+      group : "root"
+      owner: "root"
+      mode: '0755'
+    with_items:
+        - '{{ systemd_unit_directory }}'
+  - name: "Ensure group 'consul-replicate' exists"
+    group:
+      name: consul-replicate
+      state: present
+  - name: "Ensure system user 'consul-replicate' exists"
+    user: 
+      state: present
+      shell: /bin/false
+      system: yes
+      name: "consul-replicate" 
+      group: "consul-replicate"
+      home: "{{ consul_replicate_user_home_path }}"
+  become: yes

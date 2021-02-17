@@ -39,6 +39,9 @@
       command: "systemctl stop consul"
     - name: "starting consul service"
       command: "systemctl start consul"
+    - pause:
+        seconds: 30
+        prompt: waiting for consul server to start and become available
     - name: "make sure consul service is really running"
       command: "systemctl is-active consul"
   become: yes

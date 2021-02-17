@@ -1,0 +1,16 @@
+{% if consul_addr is defined and consul_addr != ""  %}consul {
+
+  address = "{{ consul_addr }}"
+
+{% if consul_namespace is defined and consul_namespace != "" %}  namespace = "{{ consul_namespace }}"
+{% endif %}
+{% if consul_token is defined and consul_token != "" %}  token = "{{ consul_token }}"
+{% endif %}
+  retry {
+    enabled = true
+    attempts = 12
+    backoff = "250ms"
+    max_backoff = "30s"
+  }
+}
+{% endif %}

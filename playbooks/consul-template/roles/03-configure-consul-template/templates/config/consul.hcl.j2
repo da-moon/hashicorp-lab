@@ -1,0 +1,29 @@
+{% if consul_addr is defined %}consul {
+  address = "[[ consul_addr ]]"
+{% if consul_namespace is defined %}  namespace = "[[ consul_namespace ]]"{% endif %}
+{% if consul_token is defined %}  token = "[[ consul_token ]]"{% endif %}
+
+  retry {
+      enabled = true
+      attempts = 12
+      backoff = "250ms"
+      max_backoff = "30s"
+  }
+}
+template {
+  contents = <<EOF
+{% if consul_addr is defined %}[relic-config]
+{{ key "demo/echo-server" }}{% endif %}
+
+{% if vault_addr is defined %}[vault-secret]{{ with secret "demo/echo-server" }}
+secret={{ .Data.secret }}
+time={{ .Data.time }}{{ end }}{% endif %}
+
+EOF
+  destination = "/etc/echo-server/config.yml"
+  exec {
+    command = "/usr/local/bin/echo-server server"
+    kill_signal = "SIGINT"
+    reload_signal = "SIGHUP"
+  }
+}{% endif %}

@@ -1,0 +1,25 @@
+---
+- block :
+  - name: "ensuring user systemd directory exits"
+    file:
+      path: "{{ item }}"
+      state: directory
+      group : "root"
+      owner: "root"
+      mode: '0755'
+    with_items:
+        - '{{ systemd_unit_directory }}'
+  - name: "Ensure group 'consul-template' exists"
+    group:
+      name: consul-template
+      state: present
+  - name: "Ensure system user 'consul-template' exists"
+    user: 
+      state: present
+      # [ TODO ] => update to /bin/false
+      shell: /bin/bash
+      system: yes
+      name: "consul-template" 
+      group: "consul-template"
+      home: "{{ consul_template_user_home_path }}"
+  become: yes

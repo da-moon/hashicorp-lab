@@ -1,0 +1,15 @@
+{% if prefix_source is defined and prefix_source != ""  %}prefix {
+  source      = "{{ prefix_source }}"
+{% if prefix_datacenter is defined and prefix_datacenter != "" %}  datacenter = "{{ prefix_datacenter }}"
+{% endif %}
+{% if prefix_destination is defined and prefix_destination != "" %}  destination = "{{ prefix_destination }}"
+{% endif %}
+}
+{% endif %}
+{% if exclude_sources is defined and exclude_sources != "" %}
+{% for item in ( exclude_sources.split(',')  | unique ) %}
+exclude {
+  source = "{{ item }}"
+}
+{% endfor %}
+{% endif %}

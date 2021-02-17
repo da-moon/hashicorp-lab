@@ -17,6 +17,5 @@ wan_serf_port : "{{ lookup('env','WAN_SERF_PORT') | default('8302', true) }}"
 
 consul_data_path : "{{ lookup('env','CONSUL_DATA_PATH') | default('/opt/consul', true) }}"
 consul_user_home_path : "/etc/consul.d"
-play_encrypted_vars_dir: "{{ inventory_dir+'/group_vars/'}}"
 
 consul_profile_path: "/etc/profile.d/consul.sh"

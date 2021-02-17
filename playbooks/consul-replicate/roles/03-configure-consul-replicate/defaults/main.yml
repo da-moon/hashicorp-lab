@@ -1,0 +1,4 @@
+---
+
+consul_replicate_user_home_path : "/etc/consul-replicate"
+consul_replicate_install_dir: "/usr/local/bin"
