@@ -1,10 +1,10 @@
 include vars.mk
-include ../../make/pkg/base/base.mk
-include ../../make/pkg/string/string.mk
-include ../../make/pkg/color/color.mk
-include ../../make/pkg/functions/functions.mk
-include ../../make/targets/buildenv/buildenv.mk
-include ../../make/targets/git/git.mk
+include ../../contrib/make/pkg/base/base.mk
+include ../../contrib/make/pkg/string/string.mk
+include ../../contrib/make/pkg/color/color.mk
+include ../../contrib/make/pkg/functions/functions.mk
+include ../../contrib/make/targets/buildenv/buildenv.mk
+include ../../contrib/make/targets/git/git.mk
 
 PROJECT_TARGETS:=$(PROJECT_NAME)
 ifneq ($(CONTAINER_COUNT),)
