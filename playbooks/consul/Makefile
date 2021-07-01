@@ -18,7 +18,7 @@ LXD_START_TARGETS = $(CONSUL_SERVER_TARGETS:%=lxd-start-%)
 LXD_STOP_TARGETS = $(CONSUL_SERVER_TARGETS:%=lxd-stop-%)
 LXD_CLEAN_TARGETS = $(CONSUL_SERVER_TARGETS:%=lxd-clean-%)
 
-include ../../make/targets/lxd/lxd.mk
+include ../../contrib/make/targets/lxd/lxd.mk
 
 THIS_FILE := $(firstword $(MAKEFILE_LIST))
 SELF_DIR := $(dir $(THIS_FILE))
